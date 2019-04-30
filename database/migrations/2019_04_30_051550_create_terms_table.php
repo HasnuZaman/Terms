@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateApprovedTermsTable extends Migration
+class CreateTermsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,14 @@ class CreateApprovedTermsTable extends Migration
      */
     public function up()
     {
-        Schema::create('approved_terms', function (Blueprint $table)
+        Schema::create('terms', function (Blueprint $table)
         {
-            $table->increments('id');
-            $table->integer('term_id');
+            $table->increments('term_id');
+            $table->string('term_title', 191);
+            $table->text('term_condition', 65535);
             $table->integer('user_id');
             $table->timestamps();
+
         });
     }
 
@@ -29,6 +31,6 @@ class CreateApprovedTermsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('approved_terms');
+        Schema::dropIfExists('terms');
     }
 }
