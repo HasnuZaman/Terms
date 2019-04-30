@@ -27,6 +27,13 @@ class HomeController extends Controller
         Session::put('SESS_USER_TYPE', auth()->user()->user_type); //to put the session value
         Session::put('SESS_USER_ID', auth()->user()->id);          //to put the session value
         $this->pendingTerms();
+
+        if (Session::get('SESS_PENDING_TERMS') == "TRUE")
+        {
+            return redirect('/pending-agreements');
+
+        }
+
         return view('home');
     }
 
@@ -43,7 +50,6 @@ class HomeController extends Controller
             if (!empty($terms))
             {
                 Session::put('SESS_PENDING_TERMS', 'TRUE'); //to put the session value
-                return redirect('/pending-agreements');
 
             }
             else
