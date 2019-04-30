@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\ApprovedTerms;
 use App\Terms;
-use Auth;
 use DB;
 use Illuminate\Http\Request;
 use Session;
@@ -13,6 +12,8 @@ class TermsController extends Controller
 {
     public function __construct()
     {
+
+        $this->middleware('checkSession');
 
     }
 
@@ -25,14 +26,15 @@ class TermsController extends Controller
     public function index()
     {
 
-        if (Session::get('SESS_USER_TYPE') != 'admin')
+        if (Session::get('SESS_USER_TYPE') != "admin")
         {
-            return redirect()->route('dashboard');
+
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
 
         }
 
         $terms = Terms::orderBy('created_at', 'DESC')->paginate(10);
-
+        $terms = array('termsData' => $terms, 'termStatus' => 'active');
         return view('terms.index')->with('terms', $terms);
     }
 
@@ -46,7 +48,9 @@ class TermsController extends Controller
 
         if (Session::get('SESS_USER_TYPE') != "admin")
         {
-            return redirect('/terms')->with('danger', 'Unauthorized Entry !!!');
+
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
+
         }
 
         return view('terms.create');
@@ -63,7 +67,9 @@ class TermsController extends Controller
 
         if (Session::get('SESS_USER_TYPE') != "admin")
         {
-            return redirect('/terms')->with('danger', 'Unauthorized Entry !!!');
+
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
+
         }
 
         $this->validate($request, [
@@ -90,12 +96,6 @@ class TermsController extends Controller
     public function show($term_id)
     {
 
-        if (Session::get('SESS_USER_ID') == "")
-        {
-
-            return redirect('/')->with('danger', 'Unauthorized Entry !!!');
-        }
-
         $term = Terms::find($term_id);
         return view('terms.show')->with('term', $term);
     }
@@ -111,7 +111,9 @@ class TermsController extends Controller
 
         if (Session::get('SESS_USER_TYPE') != "admin")
         {
-            return redirect('/terms')->with('danger', 'Unauthorized Entry !!!');
+
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
+
         }
 
         //
@@ -132,7 +134,9 @@ class TermsController extends Controller
 
         if (Session::get('SESS_USER_TYPE') != "admin")
         {
-            return redirect('/terms')->with('danger', 'Unauthorized Entry !!!');
+
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
+
         }
 
         //
@@ -163,7 +167,9 @@ class TermsController extends Controller
 
         if (Session::get('SESS_USER_TYPE') != "admin")
         {
-            return redirect('/terms')->with('danger', 'Unauthorized Entry !!!');
+
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
+
         }
 
         //
@@ -171,7 +177,6 @@ class TermsController extends Controller
         $terms->delete();
 
         return redirect('/terms')->with('success', 'Term Deleted!!');
-
     }
 
     public function approve($term_id)
@@ -198,12 +203,13 @@ class TermsController extends Controller
         if (Session::get('SESS_USER_TYPE') == "agent")
         {
 
-            $sqlQuery = "SELECT term_id,term_title,term_condition,created_at,'not_active' as term_status FROM terms WHERE term_id NOT IN (SELECT term_id FROM approved_terms where user_id=" . Session::get('SESS_USER_ID') . ")";
+            $sqlQuery = "SELECT term_id,term_title,term_condition,created_at FROM terms WHERE term_id NOT IN (SELECT term_id FROM approved_terms where user_id=" . Session::get('SESS_USER_ID') . ")";
 
             $terms = DB::select(DB::raw($sqlQuery));
 
             if (!empty($terms))
             {
+                $terms = array('termsData' => $terms, 'termStatus' => 'not_active');
 
                 return view('terms.index')->with('terms', $terms);
 

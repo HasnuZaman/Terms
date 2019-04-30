@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Session;
 
-class pending
+class CheckSession
 {
     /**
      * Handle an incoming request.
@@ -17,15 +17,10 @@ class pending
     public function handle($request, Closure $next)
     {
 
-        if (Session::get('SESS_USER_TYPE') == "agent" && Session::get('SESS_USER_ID') != "")
+        if (Session::get('SESS_USER_ID') == "")
         {
 
-            if (Session::get('SESS_PENDING_TERMS') == 'TRUE')
-            {
-
-                return redirect('/pending-agreements');
-
-            }
+            return redirect()->route('dashboard')->with('danger', 'Unauthorized Entry !!!');
 
         }
 

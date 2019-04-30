@@ -43,6 +43,7 @@ class HomeController extends Controller
             if (!empty($terms))
             {
                 Session::put('SESS_PENDING_TERMS', 'TRUE'); //to put the session value
+                return redirect('/pending-agreements');
 
             }
             else
